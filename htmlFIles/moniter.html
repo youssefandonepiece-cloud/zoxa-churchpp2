@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monitor</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background-color: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        cursor: pointer;
+        user-select: none;
+      }
+      .monitor {
+        display: grid;
+        grid-template-rows: 2fr 1fr;
+        height: 100%;
+      }
+      #current-slide-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: clamp(2rem, 4vw, 5rem);
+        font-weight: bold;
+        padding: 20px;
+        border-bottom: 2px solid #fff;
+        white-space: pre-line;
+      }
+      .bottom-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: 100%;
+      }
+      #clock {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: clamp(1.5rem, 3vw, 3rem);
+        font-weight: bold;
+        border-right: 2px solid #fff;
+      }
+      #next-slide-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: clamp(1.5rem, 3vw, 3rem);
+        padding: 20px;
+        color: #ccc;
+        white-space: pre-line;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main-slide">
+      <div class="monitor">
+        <div id="current-slide-box">—</div>
+        <div class="bottom-section">
+          <div id="clock">00:00:00</div>
+          <div id="next-slide-box">—</div>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.addEventListener('click', async () => {
+        if (!document.fullscreenEnabled) return;
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else await document.getElementById('main-slide').requestFullscreen();
+        } catch (err) {
+          console.error(`Error toggling fullscreen: ${err.message}`);
+        }
+      });
+
+      const setClock = () => {
+        const clockEl = document.getElementById('clock');
+        if (!clockEl) return;
+        clockEl.textContent = new Date().toLocaleTimeString([], {
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+        });
+      };
+      setClock();
+      setInterval(setClock, 1000);
+
+      window.addEventListener('message', (event) => {
+        if (event.data?.type !== 'UPDATE_SLIDES') return;
+        const current = document.getElementById('current-slide-box');
+        const next = document.getElementById('next-slide-box');
+        if (current) current.textContent = event.data.current || '—';
+        if (next) next.textContent = event.data.next || '—';
+      });
+    </script>
+  </body>
+</html>

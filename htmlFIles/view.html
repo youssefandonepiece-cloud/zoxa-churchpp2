@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoxa - Presentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        #main-slide {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5%;
+            font-size: clamp(2rem, 6vw, 6rem);
+            font-weight: bold;
+            white-space: pre-line;
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
+        #main-slide.lower-third {
+            align-items: flex-end;
+            padding-bottom: 10%;
+            font-size: clamp(1.5rem, 3vw, 3rem);
+        }
+        #main-slide.lower-third .lt-bar {
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 20px 60px;
+            border-radius: 12px;
+            max-width: 90%;
+            text-align: center;
+            line-height: 1.2;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-left: 8px solid #00e676;
+            backdrop-filter: blur(8px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #viewLogoLayer { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+        #viewLogoLayer .church-logo { position: absolute; object-fit: contain; user-select: none; pointer-events: none; }
+        #viewLogoLayer .church-logo[data-pos="top-left"]     { top: 2%; left: 2%; }
+        #viewLogoLayer .church-logo[data-pos="top-right"]    { top: 2%; right: 2%; }
+        #viewLogoLayer .church-logo[data-pos="bottom-left"]  { bottom: 2%; left: 2%; }
+        #viewLogoLayer .church-logo[data-pos="bottom-right"] { bottom: 2%; right: 2%; }
+        #view-countdown {
+            position: absolute;
+            top: 30px; left: 30px;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: none;
+            font-family: monospace;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-slide"></div>
+    <div id="viewLogoLayer" aria-hidden="true"></div>
+    <div id="view-countdown"></div>
+
+    <script>
+        document.addEventListener('click', () => {
+            if (document.fullscreenEnabled) {
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else {
+                    document.getElementById('main-slide').requestFullscreen().catch(err => console.error(err));
+                }
+            }
+        });
+
+        const viewLogoLayer = document.getElementById('viewLogoLayer');
+
+        function applyLogo(logo) {
+            if (!viewLogoLayer) return;
+            viewLogoLayer.replaceChildren();
+            if (!logo || !logo.dataUrl) return;
+
+            const img = document.createElement('img');
+            img.className = 'church-logo';
+            img.src = logo.dataUrl;
+            img.dataset.pos = logo.position || 'top-left';
+            img.style.width = (Number(logo.sizePercent) || 12) + '%';
+            img.style.height = 'auto';
+            img.style.opacity = String((Number(logo.opacity) || 100) / 100);
+            viewLogoLayer.appendChild(img);
+        }
+
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (!data || typeof data !== 'object') return;
+
+            if (data.type === 'UPDATE_VIEW') {
+                const slideBox = document.getElementById('main-slide');
+                if (!slideBox) return;
+
+                if (data.isLowerThird) {
+                    slideBox.classList.add('lower-third');
+                    slideBox.innerHTML = `<div class="lt-bar">${data.content || ''}</div>`;
+                    document.body.style.backgroundColor = data.bgColor || '#000';
+                } else {
+                    slideBox.classList.remove('lower-third');
+                    slideBox.innerHTML = data.content || '';
+                    document.body.style.backgroundColor = data.bgColor || '#000';
+                    if (data.fontColor) slideBox.style.color = data.fontColor;
+                }
+                return;
+            }
+
+            if (data.type === 'UPDATE_LOGO') {
+                applyLogo(data.logo || null);
+                return;
+            }
+
+            if (data.type === 'UPDATE_COUNTDOWN') {
+                const timerEl = document.getElementById('view-countdown');
+                if (timerEl) {
+                    if (data.time) {
+                        timerEl.textContent = data.time;
+                        timerEl.style.display = 'block';
+                    } else {
+                        timerEl.style.display = 'none';
+                    }
+                }
+                return;
+            }
+        });
+
+        if (window.opener && !window.opener.closed) {
+            try {
+                window.opener.postMessage({ type: 'REQUEST_LOGO' }, '*');
+            } catch (err) {}
+        }
+    </script>
+</body>
+</html>
