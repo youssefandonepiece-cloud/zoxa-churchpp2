@@ -1,0 +1,250 @@
+<!-- @format -->
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zoxa</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+{
+  "imports": {
+    "fuse.js": "./lib/fuse.mjs"
+  }
+}
+</script>
+  </head>
+  <body>
+    <nav id="nav">
+      <div class="logo" id="logo">
+        <img />
+        <h2>zoxa</h2>
+      </div>
+
+      <div class="button" id="button">
+        <button id="newsbtn">ما الجديد</button>
+        <button id="settingsBtn">الإعدادات</button>
+        <button id="liveBtn" class="liveBtn" style="background-color: brown;" >البث المباشر</button>
+      </div>
+    </nav>
+
+    <aside id="searchSection" class="section">
+
+      <input
+      id="search"
+      type="search"
+      placeholder="ابحث عن ترنيمه او ايه..."
+      autocomplete="off" />
+
+      <div id="searchResult" aria-live="polite"></div>
+
+    </aside>
+
+    <aside id="playlist_setlist" class="setlist_playlist">
+      <button id="addSectionbtn" class="setlist-header">+</button>
+      <div id="setlist"></div>
+    </aside>
+
+    <main class="slides" id="slides">
+      <!-- slides injected by js -->
+    </main>
+
+    <main class="slidesEditor" id="slidesEditor">
+      <div id="slideEditorIcons">
+        <!-- this part with ts -->
+      </div>
+    </main>
+
+    <aside id="preview-Controls" style="position: relative;">
+      <div id="previewWindow">
+      </div>
+  
+      <div id="logoLayer" aria-hidden="true"></div>
+
+      <div id="countdownOverlay" class="hidden">
+        00:00
+      </div>
+
+      <div id="controls" class="ctrl">
+        <button id="prevBtn" dir="ltr">السابق(->)</button>
+        <button id="nextBtn" dir="ltr">(<-)التالي</button>
+        <button id="blank">فارغ(ctrl-b)</button>
+        <button id="clearPreview">مسح</button>
+      </div>
+    </aside>
+
+    <aside id="QuickAction">
+      <div id="quickActionBtns">
+        <button id="addSlide" class="quickActionbtn">إضافة شريحة</button>
+        <button id="openMoniterScreen" class="quickActionbtn">افتح نافذة المراقبة</button>
+        <button id="audioVideoControll" class="quickActionbtn">عناصر التحكم في الصوت/الفيديو</button>
+        <button id="changeColorBg" class="quickActionbtn">تغيير لون الخلفية</button>
+        <button id="changeFontColor" class="quickActionbtn">تغيير لون الخط</button>
+        <button id="addCountdown" class="quickActionbtn">أضف عدّاً تنازلياً</button>
+        <button id="addChurchLogo" class="quickActionbtn">إضافة شعار</button>
+        <button id="removeChurchLogo" class="quickActionbtn">إزالة الشعار</button>
+        <button id="addThemes" class="quickActionbtn">إضافة سمة</button>
+      </div>
+    </aside>
+
+    <!-- Quick Lyrics Modal -->
+    <div id="addSlideModal" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="header-left">
+            <button id="closeModalBtn" class="icon-btn">←</button>
+            <h2>New show</h2>
+          </div>
+          <div class="header-right">
+            <button class="icon-btn">⚙</button>
+            <button id="closeModalX" class="icon-btn">✕</button>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <div class="input-group">
+            <label>Quick lyrics</label>
+            <textarea id="newSlideBody" placeholder="Enter lyrics or any text here..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="createSlideBtn" class="create-btn">
+            + Create
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Picker Modal -->
+    <div id="colorModal" class="modal-overlay hidden">
+      <div class="modal-dialog" style="width: 300px; text-align: center;">
+        <div class="modal-header">
+          <h2>Color Picker</h2>
+          <button id="closeColorModal" class="icon-btn">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 30px;">
+          <input type="color" id="colorPicker" style="width: 100px; height: 100px; cursor: pointer; border: none; background: transparent;" />
+          <input type="color" id="FontcolorPicker" style="width: 100px; height: 100px; cursor: pointer; border: none; background: transparent;" />
+        </div>
+
+        <div class="modal-footer">
+          <button id="applyColorBtn" class="create-btn">Apply to All</button>
+        </div>
+      </div>
+    </div>	
+
+    <!-- Church Logo Modal -->
+    <div id="logoModal" class="modal-overlay hidden">
+      <div class="modal-dialog" style="width: 420px;">
+        <div class="modal-header">
+          <h2>Church Logo</h2>
+          <button id="closeLogoModal" class="icon-btn">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div class="input-group">
+            <label for="logoFile">Upload image</label>
+            <input type="file" id="logoFile" accept="image/*" />
+          </div>
+
+          <div style="text-align:center;">
+            <img id="logoPreview" alt="logo preview"
+                 style="max-width:120px; max-height:120px; display:none; border:1px dashed #444; padding:6px;" />
+          </div>
+
+          <div>
+            <label style="display:block; margin-bottom:6px;">Position</label>
+            <div id="logoPositionGroup" role="radiogroup" style="display:flex; gap:8px;">
+              <button type="button" class="logo-pos" data-pos="top-left"    aria-pressed="true">↖</button>
+              <button type="button" class="logo-pos" data-pos="top-right"   aria-pressed="false">↗</button>
+              <button type="button" class="logo-pos" data-pos="bottom-left" aria-pressed="false">↙</button>
+              <button type="button" class="logo-pos" data-pos="bottom-right" aria-pressed="false">↘</button>
+            </div>
+          </div>
+
+          <div>
+            <label for="logoSize">Size: <span id="logoSizeValue">12</span>% of width</label>
+            <input type="range" id="logoSize" min="5" max="40" step="1" value="12" style="width:100%;" />
+          </div>
+
+          <div>
+            <label for="logoOpacity">Opacity: <span id="logoOpacityValue">100</span>%</label>
+            <input type="range" id="logoOpacity" min="20" max="100" step="1" value="100" style="width:100%;" />
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display:flex; gap:8px; justify-content:flex-end;">
+          <button id="logoCancelBtn" class="icon-btn">Cancel</button>
+          <button id="logoApplyBtn" class="create-btn">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- What's New Modal -->
+    <div id="newsModal" class="modal-overlay hidden">
+      <div class="modal-dialog" style="width: 400px;">
+        <div class="modal-header">
+          <h2>ما الجديد؟</h2>
+          <button id="closeNewsModal" class="icon-btn">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; color: #fff; line-height: 1.6;">
+          <p><strong>الإصدار 1.0 (الإصدار الأول)</strong></p>
+          <ul style="margin-top: 10px; padding-right: 20px;">
+            <li>إضافة شريط التحكم السريع (Quick Action)</li>
+            <li>تحسين نافذة المراقبة (Stage Monitor)</li>
+            <li>إضافة إمكانية رفع شعار الكنيسة</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button id="closeNewsBtn" class="create-btn">حسناً</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+      <div class="modal-dialog" style="width: 400px;">
+        <div class="modal-header">
+          <h2>الإعدادات</h2>
+          <button id="closeSettingsModal" class="icon-btn">✕</button>
+        </div>
+        <div class="modal-body" style="padding: 20px; color: #fff;">
+          <div class="input-group" style="margin-bottom: 15px;">
+            <label>حجم الخط الافتراضي (Default Font Size)</label>
+            <input type="range" id="defaultFontSize" min="16" max="72" value="32" style="width: 100%; margin-top: 10px;" />
+            <span id="fontSizeValue" style="color: #01d58f;">32px</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveSettingsBtn" class="create-btn">حفظ الإعدادات</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown Modal -->
+    <div id="countdownModal" class="modal-overlay hidden">
+      <div class="modal-dialog" style="width: 300px;">
+        <div class="modal-header">
+          <h2>Countdown Timer</h2>
+          <button id="closeCountdownModal" class="icon-btn">✕</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 20px;">
+          <div class="input-group">
+            <label>Time in minutes</label>
+            <input type="number" id="countdownMinutes" min="1" value="5" style="width: 100%; padding: 10px; font-size: 16px; margin-top: 5px;" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="startCountdownBtn" class="create-btn">Start Timer</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./dist/app.js"></script>
+  </body>
+</html>
