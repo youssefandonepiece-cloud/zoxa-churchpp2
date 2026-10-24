@@ -2,14 +2,12 @@ const CACHE_NAME = "zoxa-v1.1";
 const ASSETS = [
   "./",
   "./index.html",
-  "./style.css",
+  "./styles.css",
   "./dist/app.js", 
   "./dist/search.js",
   "./dist/types.js",
-  "./src/countdowntimer.js",
   "./data/songs.json", 
   "./data/bible.json",
-  // "./data/zoxa.json",
   "./htmlFIles/moniter.html",
   "./htmlFIles/view.html",
   "./lib/fuse.mjs"
