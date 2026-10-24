@@ -19,7 +19,14 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      console.log("Caching assets individually...");
+      return Promise.all(
+        ASSETS.map((url) => {
+          return cache.add(url).catch((err) => {
+            console.error(`Failed to cache: ${url}`, err);
+          });
+        })
+      );
     })
   );
 });
